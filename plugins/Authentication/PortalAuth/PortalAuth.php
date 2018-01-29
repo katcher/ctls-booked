@@ -63,25 +63,37 @@ class PortalAuth extends Authentication implements IAuthentication
 	{
 		$token = $_GET['token'];
 		$dbname = $_GET['dbname'];
-		$this->netname = $this->GetUserFromToken($token, $dbname, PortalAuthConfig::REVAUTHURL);
-		if($this->netname)
-		{			
-			$tmp = $this->GetConuUserInfo($this->netname, PortalAuthConfig::ORACLEHOST, PortalAuthConfig::ORACLEPORT, PortalAuthConfig::ORACLESERVICE, PortalAuthConfig::ORACLEUNAME, PortalAuthConfig::ORACLEPWD);
-			if($tmp) {
-				return true;
-			}
-			return false;
-		}
+		
+		if($token && $dbname)
+		{
+			$this->netname = $this->GetUserFromToken($token, $dbname, PortalAuthConfig::REVAUTHURL);
+			if($this->netname)
+			{
+				$tmp = $this->GetConuUserInfo($this->netname, PortalAuthConfig::ORACLEHOST, PortalAuthConfig::ORACLEPORT, PortalAuthConfig::ORACLESERVICE, PortalAuthConfig::ORACLEUNAME, PortalAuthConfig::ORACLEPWD);
+				if($tmp) {
+					return true;
+				}
+				return false;
+			}			
+		}	
+		else 
+		{
+			return $this->authToDecorate->Validate($username, $password);
+		}		
 		return false;
 	}
 
 	public function Login($username, $loginContext)
 	{
+		if($username) 
+		{
+			return $this->authToDecorate->Login($username, $loginContext);
+		}
 		if( strlen($this->myuser->GetLastName()) > 0 )
 		{
 			$this->Synchronize($this->netname);
 		}
-		return $this->authToDecorate->Login($this->netname, $loginContext);
+		return $this->authToDecorate->Login($this->netname, $loginContext);		
 	}
 
 	public function Logout(UserSession $user)
@@ -96,12 +108,12 @@ class PortalAuth extends Authentication implements IAuthentication
 
 	public function ShowUsernamePrompt()
 	{
-		return false;
+		return true;
 	}
 
 	public function ShowPasswordPrompt()
 	{
-		return false;
+		return true;
 	}
 
 	public function ShowPersistLoginPrompt()
