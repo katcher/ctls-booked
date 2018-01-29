@@ -61,9 +61,8 @@ class PortalAuth extends Authentication implements IAuthentication
 
 	public function Validate($username, $password)
 	{
-		$token = $_GET['token'];
-		$dbname = $_GET['dbname'];
-		
+		isset($_GET['token']) ? $token = $_GET['token'] : $token = null;
+		isset($_GET['dbname']) ? $dbname = $_GET['dbname'] : $dbname = null;		
 		if($token && $dbname)
 		{
 			$this->netname = $this->GetUserFromToken($token, $dbname, PortalAuthConfig::REVAUTHURL);
@@ -222,7 +221,7 @@ class PortalAuth extends Authentication implements IAuthentication
 			$this->myuser->GetPhone(), 
 		 	$this->myuser->GetInstitution()
 		  )
-		);
+		, true);
 	}
 	
 	
